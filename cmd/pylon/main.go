@@ -46,7 +46,10 @@ func main() {
 }
 
 func runCal(args []string) {
-	cfg := config.Load()
+	cfg, err := config.Load()
+	if err != nil {
+		fatal("config: %v", err)
+	}
 
 	// Allow --url flag to override
 	url := cfg.CalURL
@@ -230,7 +233,10 @@ func runCalSubscribe(client *cal.Client, args []string) {
 // --- Discord commands ---
 
 func runDiscord(args []string) {
-	cfg := config.Load()
+	cfg, err := config.Load()
+	if err != nil {
+		fatal("config: %v", err)
+	}
 	client := discord.NewClient(cfg.DiscordBotToken, cfg.DiscordWebhook)
 
 	switch args[0] {
@@ -274,7 +280,7 @@ func runDiscord(args []string) {
 			}
 		}
 		if channelID == "" {
-			fatal("channel ID required\nUsage: pylon discord read [--channel <id>] [--count N]\nOr set PYLON_DISCORD_CHANNEL_ID")
+			fatal("channel ID required\nUsage: pylon discord read [--channel <id>] [--count N]\nOr set channel_id in ~/.pylonrc [discord] or PYLON_DISCORD_CHANNEL_ID")
 		}
 		msgs, err := client.ReadMessages(channelID, count)
 		if err != nil {
@@ -297,7 +303,7 @@ func runDiscord(args []string) {
 			}
 		}
 		if guildID == "" {
-			fatal("guild ID required\nUsage: pylon discord channels --guild <id>\nOr set PYLON_DISCORD_GUILD_ID")
+			fatal("guild ID required\nUsage: pylon discord channels --guild <id>\nOr set guild_id in ~/.pylonrc [discord] or PYLON_DISCORD_GUILD_ID")
 		}
 		channels, err := client.ListChannels(guildID)
 		if err != nil {
@@ -411,6 +417,10 @@ Other:
   version     Show version
   help        Show this help
 
+Configuration:
+  ~/.pylonrc            INI-style config file (optional)
+  PYLON_* env vars      Override config file values
+
 Run 'pylon <service> --help' for service-specific commands.
 `)
 }
@@ -426,8 +436,9 @@ Resources:
   event       Manage calendar events
   subscribe   Get subscription URLs for a feed
 
-Environment:
-  PYLON_CAL_URL   Base URL for the cal service (default: http://localhost:8085)
+Configuration:
+  ~/.pylonrc [cal] url = ...     Base URL for the cal service
+  PYLON_CAL_URL                  Env var override (default: http://localhost:8085)
 `)
 }
 
@@ -475,10 +486,10 @@ Commands:
   read [--channel <id>] [--count N] Read recent messages from a channel
   channels [--guild <id>]           List text channels in a guild
 
-Environment:
-  PYLON_DISCORD_WEBHOOK      Webhook URL for sending messages
-  PYLON_DISCORD_BOT_TOKEN    Bot token for reading messages/channels
-  PYLON_DISCORD_GUILD_ID     Default guild (server) ID
-  PYLON_DISCORD_CHANNEL_ID   Default channel ID for reading
+Configuration (~/.pylonrc [discord] section or env vars):
+  webhook      / PYLON_DISCORD_WEBHOOK      Webhook URL for sending messages
+  bot_token    / PYLON_DISCORD_BOT_TOKEN    Bot token for reading messages/channels
+  guild_id     / PYLON_DISCORD_GUILD_ID     Default guild (server) ID
+  channel_id   / PYLON_DISCORD_CHANNEL_ID   Default channel ID for reading
 `)
 }

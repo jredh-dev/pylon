@@ -1,6 +1,23 @@
 pylon - Change Log
 
 ================================================================================
+Version 0.3.0 (2026-02-18) [UNRELEASED]
+================================================================================
+
+NEW FEATURES:
+  * Added ~/.pylonrc config file support with INI-style sections
+    - [cal] section: url
+    - [discord] section: webhook, bot_token, guild_id, channel_id
+  * Environment variables override config file values (PYLON_* takes precedence)
+  * Config file is optional — env-only config still works
+
+IMPROVEMENTS:
+  * Load() now returns (*Config, error) for proper error propagation
+  * Updated all usage/help text to document both config sources
+  * Comprehensive test coverage for INI parser (sections, comments, whitespace,
+    unknown keys, malformed lines, env override precedence)
+
+================================================================================
 Version 0.2.0 (2026-02-18) [UNRELEASED]
 ================================================================================
 
