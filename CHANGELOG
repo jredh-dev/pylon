@@ -1,0 +1,28 @@
+xor - Change Log
+
+================================================================================
+Version 0.1.0 (2026-02-18) [UNRELEASED]
+================================================================================
+
+NEW FEATURES:
+  * Initial release of xor CLI tool
+  * Cal service integration:
+    - feed create/list/delete: Manage calendar feeds
+    - event add/list/delete: Manage calendar events
+    - subscribe: Get webcal:// and https:// subscription URLs
+  * HTTP client for cal service API with full error handling
+  * Config via XOR_CAL_URL env var (default http://localhost:8085)
+  * --url flag override for per-command base URL
+  * Tabwriter-formatted output for list commands
+
+ARCHITECTURE:
+  * Stdlib only - no external CLI framework
+  * cmd/xor/main.go: CLI entry point with subcommand routing
+  * internal/cal/client.go: HTTP client for all cal API endpoints
+  * internal/config/config.go: Environment-based configuration
+  * Namespaced commands (xor cal ...) designed for future service growth
+
+TESTING:
+  * Table-driven tests for all cal client methods (mock HTTP server)
+  * Config package tests with env var isolation
+  * 20 test cases covering success, error, and edge cases
