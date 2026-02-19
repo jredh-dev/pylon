@@ -27,11 +27,11 @@ func NewClient(baseURL string) *Client {
 
 // Feed represents a calendar feed.
 type Feed struct {
-	ID        string    `json:"ID"`
-	Name      string    `json:"Name"`
-	Token     string    `json:"Token"`
-	CreatedAt time.Time `json:"CreatedAt"`
-	UpdatedAt time.Time `json:"UpdatedAt"`
+	ID        string    `json:"id"`
+	Name      string    `json:"name"`
+	Token     string    `json:"token"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
 }
 
 // CreateFeedResponse is the response from creating a feed.
@@ -44,20 +44,20 @@ type CreateFeedResponse struct {
 
 // Event represents a calendar event.
 type Event struct {
-	ID          string     `json:"ID"`
-	FeedID      string     `json:"FeedID"`
-	Summary     string     `json:"Summary"`
-	Description string     `json:"Description"`
-	Location    string     `json:"Location"`
-	URL         string     `json:"URL"`
-	Start       time.Time  `json:"Start"`
-	End         *time.Time `json:"End"`
-	AllDay      bool       `json:"AllDay"`
-	Deadline    *time.Time `json:"Deadline"`
-	Status      string     `json:"Status"`
-	Categories  string     `json:"Categories"`
-	CreatedAt   time.Time  `json:"CreatedAt"`
-	UpdatedAt   time.Time  `json:"UpdatedAt"`
+	ID          string     `json:"id"`
+	FeedID      string     `json:"feed_id"`
+	Summary     string     `json:"summary"`
+	Description string     `json:"description"`
+	Location    string     `json:"location"`
+	URL         string     `json:"url"`
+	Start       time.Time  `json:"start"`
+	End         *time.Time `json:"end,omitempty"`
+	AllDay      bool       `json:"all_day"`
+	Deadline    *time.Time `json:"deadline,omitempty"`
+	Status      string     `json:"status"`
+	Categories  string     `json:"categories"`
+	CreatedAt   time.Time  `json:"created_at"`
+	UpdatedAt   time.Time  `json:"updated_at"`
 }
 
 // CreateEventRequest is the payload for creating an event.
@@ -87,7 +87,7 @@ func (e *APIError) Error() string {
 
 // CreateFeed creates a new calendar feed. If slug is non-empty, it is used as
 // a readable token for the subscription URL (e.g. "my-calendar" ->
-// /cal/my-calendar.ics). Otherwise the server generates a UUID token.
+// /my-calendar.ics). Otherwise the server generates a UUID token.
 func (c *Client) CreateFeed(name, slug string) (*CreateFeedResponse, error) {
 	payload := map[string]string{"name": name}
 	if slug != "" {
@@ -207,7 +207,7 @@ func (c *Client) DeleteEvent(id string) error {
 
 // SubscribeURL returns the webcal subscription URL for a feed token.
 func (c *Client) SubscribeURL(token string) string {
-	return c.baseURL + "/cal/" + token + ".ics"
+	return c.baseURL + "/" + token + ".ics"
 }
 
 // --- HTTP helpers ---

@@ -24,7 +24,7 @@ func TestCreateFeed(t *testing.T) {
 			feedName:   "Work",
 			slug:       "",
 			status:     http.StatusCreated,
-			response:   `{"id":"feed-1","name":"Work","token":"abc123","url":"/cal/abc123.ics"}`,
+			response:   `{"id":"feed-1","name":"Work","token":"abc123","url":"/abc123.ics"}`,
 			wantErr:    false,
 			wantFeedID: "feed-1",
 		},
@@ -33,7 +33,7 @@ func TestCreateFeed(t *testing.T) {
 			feedName:   "My Calendar",
 			slug:       "my-calendar",
 			status:     http.StatusCreated,
-			response:   `{"id":"feed-2","name":"My Calendar","token":"my-calendar","url":"/cal/my-calendar.ics"}`,
+			response:   `{"id":"feed-2","name":"My Calendar","token":"my-calendar","url":"/my-calendar.ics"}`,
 			wantErr:    false,
 			wantFeedID: "feed-2",
 			wantSlug:   true,
@@ -446,7 +446,7 @@ func TestDeleteEvent(t *testing.T) {
 func TestSubscribeURL(t *testing.T) {
 	client := NewClient("https://cal.example.com")
 	got := client.SubscribeURL("my-token")
-	want := "https://cal.example.com/cal/my-token.ics"
+	want := "https://cal.example.com/my-token.ics"
 	if got != want {
 		t.Errorf("expected %q, got %q", want, got)
 	}
