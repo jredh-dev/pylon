@@ -12,22 +12,36 @@ func TestCreateFeed(t *testing.T) {
 	tests := []struct {
 		name       string
 		feedName   string
+		slug       string
 		status     int
 		response   string
 		wantErr    bool
 		wantFeedID string
+		wantSlug   bool // expect slug in request body
 	}{
 		{
-			name:       "success",
+			name:       "success without slug",
 			feedName:   "Work",
+			slug:       "",
 			status:     http.StatusCreated,
 			response:   `{"id":"feed-1","name":"Work","token":"abc123","url":"/cal/abc123.ics"}`,
 			wantErr:    false,
 			wantFeedID: "feed-1",
 		},
 		{
+			name:       "success with slug",
+			feedName:   "My Calendar",
+			slug:       "my-calendar",
+			status:     http.StatusCreated,
+			response:   `{"id":"feed-2","name":"My Calendar","token":"my-calendar","url":"/cal/my-calendar.ics"}`,
+			wantErr:    false,
+			wantFeedID: "feed-2",
+			wantSlug:   true,
+		},
+		{
 			name:     "server error",
 			feedName: "Bad",
+			slug:     "",
 			status:   http.StatusInternalServerError,
 			response: `{"error":"database error"}`,
 			wantErr:  true,
@@ -35,9 +49,11 @@ func TestCreateFeed(t *testing.T) {
 		{
 			name:     "conflict",
 			feedName: "Duplicate",
+			slug:     "taken-slug",
 			status:   http.StatusConflict,
 			response: `{"error":"feed already exists"}`,
 			wantErr:  true,
+			wantSlug: true,
 		},
 	}
 
@@ -58,6 +74,15 @@ func TestCreateFeed(t *testing.T) {
 				if body["name"] != tt.feedName {
 					t.Errorf("expected name %q, got %q", tt.feedName, body["name"])
 				}
+				if tt.wantSlug {
+					if body["slug"] != tt.slug {
+						t.Errorf("expected slug %q, got %q", tt.slug, body["slug"])
+					}
+				} else {
+					if _, ok := body["slug"]; ok {
+						t.Error("expected no slug in request body, but got one")
+					}
+				}
 
 				w.WriteHeader(tt.status)
 				_, _ = w.Write([]byte(tt.response))
@@ -65,7 +90,7 @@ func TestCreateFeed(t *testing.T) {
 			defer srv.Close()
 
 			client := NewClient(srv.URL)
-			feed, err := client.CreateFeed(tt.feedName)
+			feed, err := client.CreateFeed(tt.feedName, tt.slug)
 
 			if tt.wantErr {
 				if err == nil {

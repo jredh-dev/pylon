@@ -89,10 +89,18 @@ func runCalFeed(client *cal.Client, args []string) {
 	switch args[0] {
 	case "create":
 		if len(args) < 2 {
-			fatal("usage: pylon cal feed create <name>")
+			fatal("usage: pylon cal feed create <name> [slug]")
 		}
-		name := strings.Join(args[1:], " ")
-		feed, err := client.CreateFeed(name)
+		// Last arg is the slug if there are 3+ args, otherwise no slug.
+		// Name can be multiple words, slug is always the final single token.
+		var name, slug string
+		if len(args) >= 3 {
+			slug = args[len(args)-1]
+			name = strings.Join(args[1:len(args)-1], " ")
+		} else {
+			name = strings.Join(args[1:], " ")
+		}
+		feed, err := client.CreateFeed(name, slug)
 		if err != nil {
 			fatal("create feed: %v", err)
 		}
@@ -328,9 +336,9 @@ func calFeedUsage() {
 	fmt.Fprintf(os.Stderr, `pylon cal feed - manage calendar feeds
 
 Commands:
-  create <name>       Create a new feed
-  list                List all feeds
-  delete <id>         Delete a feed and all its events
+  create <name> [slug]  Create a new feed (slug sets a readable URL token)
+  list                  List all feeds
+  delete <id>           Delete a feed and all its events
 `)
 }
 
