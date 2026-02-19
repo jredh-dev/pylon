@@ -3,12 +3,14 @@ package main
 import (
 	"fmt"
 	"os"
+	"strconv"
 	"strings"
 	"text/tabwriter"
 	"time"
 
 	"github.com/jredh-dev/pylon/internal/cal"
 	"github.com/jredh-dev/pylon/internal/config"
+	"github.com/jredh-dev/pylon/internal/discord"
 )
 
 var version = "dev"
@@ -28,6 +30,12 @@ func main() {
 			os.Exit(1)
 		}
 		runCal(os.Args[2:])
+	case "discord":
+		if len(os.Args) < 3 {
+			discordUsage()
+			os.Exit(1)
+		}
+		runDiscord(os.Args[2:])
 	case "help", "--help", "-h":
 		usage()
 	default:
@@ -219,6 +227,96 @@ func runCalSubscribe(client *cal.Client, args []string) {
 	fmt.Println("For Google Calendar, use the https URL in 'Other calendars > From URL'.")
 }
 
+// --- Discord commands ---
+
+func runDiscord(args []string) {
+	cfg := config.Load()
+	client := discord.NewClient(cfg.DiscordBotToken, cfg.DiscordWebhook)
+
+	switch args[0] {
+	case "msg", "send":
+		if len(args) < 2 {
+			fatal("usage: pylon discord msg <message>")
+		}
+		message := strings.Join(args[1:], " ")
+		if err := client.SendMessage(message); err != nil {
+			fatal("discord msg: %v", err)
+		}
+		fmt.Println("Message sent.")
+
+	case "read":
+		channelID := cfg.DiscordChannelID
+		count := 20
+		for i := 1; i < len(args); i++ {
+			switch args[i] {
+			case "--channel":
+				if i+1 < len(args) {
+					i++
+					channelID = args[i]
+				}
+			case "--count":
+				if i+1 < len(args) {
+					i++
+					n, err := strconv.Atoi(args[i])
+					if err == nil && n > 0 {
+						count = n
+					}
+				}
+			default:
+				if strings.HasPrefix(args[i], "--channel=") {
+					channelID = strings.TrimPrefix(args[i], "--channel=")
+				} else if strings.HasPrefix(args[i], "--count=") {
+					n, err := strconv.Atoi(strings.TrimPrefix(args[i], "--count="))
+					if err == nil && n > 0 {
+						count = n
+					}
+				}
+			}
+		}
+		if channelID == "" {
+			fatal("channel ID required\nUsage: pylon discord read [--channel <id>] [--count N]\nOr set PYLON_DISCORD_CHANNEL_ID")
+		}
+		msgs, err := client.ReadMessages(channelID, count)
+		if err != nil {
+			fatal("discord read: %v", err)
+		}
+		if len(msgs) == 0 {
+			fmt.Println("No messages found.")
+			return
+		}
+		fmt.Print(discord.FormatMessages(msgs))
+
+	case "channels":
+		guildID := cfg.DiscordGuildID
+		for i := 1; i < len(args); i++ {
+			if args[i] == "--guild" && i+1 < len(args) {
+				i++
+				guildID = args[i]
+			} else if strings.HasPrefix(args[i], "--guild=") {
+				guildID = strings.TrimPrefix(args[i], "--guild=")
+			}
+		}
+		if guildID == "" {
+			fatal("guild ID required\nUsage: pylon discord channels --guild <id>\nOr set PYLON_DISCORD_GUILD_ID")
+		}
+		channels, err := client.ListChannels(guildID)
+		if err != nil {
+			fatal("discord channels: %v", err)
+		}
+		tw := tabwriter.NewWriter(os.Stdout, 0, 4, 2, ' ', 0)
+		fmt.Fprintf(tw, "ID\tNAME\n")
+		for _, ch := range channels {
+			fmt.Fprintf(tw, "%s\t#%s\n", ch.ID, ch.Name)
+		}
+		_ = tw.Flush()
+
+	default:
+		fmt.Fprintf(os.Stderr, "unknown discord command: %s\n\n", args[0])
+		discordUsage()
+		os.Exit(1)
+	}
+}
+
 // --- flag parsing helpers ---
 
 func parseEventFlags(args []string) *cal.CreateEventRequest {
@@ -307,6 +405,7 @@ Usage:
 
 Services:
   cal         Calendar subscription service
+  discord     Discord messaging and channel access
 
 Other:
   version     Show version
@@ -362,5 +461,24 @@ Flags for 'add':
   --deadline <datetime>  Deadline with alarm
   --status <status>   TENTATIVE, CONFIRMED, or CANCELLED
   --categories <list> Comma-separated categories
+`)
+}
+
+func discordUsage() {
+	fmt.Fprintf(os.Stderr, `pylon discord - Discord messaging and channel access
+
+Usage:
+  pylon discord <command> [flags]
+
+Commands:
+  msg <message>                     Send a message via webhook
+  read [--channel <id>] [--count N] Read recent messages from a channel
+  channels [--guild <id>]           List text channels in a guild
+
+Environment:
+  PYLON_DISCORD_WEBHOOK      Webhook URL for sending messages
+  PYLON_DISCORD_BOT_TOKEN    Bot token for reading messages/channels
+  PYLON_DISCORD_GUILD_ID     Default guild (server) ID
+  PYLON_DISCORD_CHANNEL_ID   Default channel ID for reading
 `)
 }

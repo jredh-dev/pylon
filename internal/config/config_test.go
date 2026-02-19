@@ -42,3 +42,48 @@ func TestLoad(t *testing.T) {
 		})
 	}
 }
+
+func TestLoadDiscordConfig(t *testing.T) {
+	t.Setenv("PYLON_DISCORD_WEBHOOK", "https://discord.com/api/webhooks/123/abc")
+	t.Setenv("PYLON_DISCORD_BOT_TOKEN", "Bot.Token.Here")
+	t.Setenv("PYLON_DISCORD_GUILD_ID", "guild-123")
+	t.Setenv("PYLON_DISCORD_CHANNEL_ID", "chan-456")
+
+	cfg := Load()
+
+	if cfg.DiscordWebhook != "https://discord.com/api/webhooks/123/abc" {
+		t.Errorf("expected webhook URL, got %q", cfg.DiscordWebhook)
+	}
+	if cfg.DiscordBotToken != "Bot.Token.Here" {
+		t.Errorf("expected bot token, got %q", cfg.DiscordBotToken)
+	}
+	if cfg.DiscordGuildID != "guild-123" {
+		t.Errorf("expected guild ID, got %q", cfg.DiscordGuildID)
+	}
+	if cfg.DiscordChannelID != "chan-456" {
+		t.Errorf("expected channel ID, got %q", cfg.DiscordChannelID)
+	}
+}
+
+func TestLoadDiscordConfigDefaults(t *testing.T) {
+	// Clear all discord env vars
+	t.Setenv("PYLON_DISCORD_WEBHOOK", "")
+	t.Setenv("PYLON_DISCORD_BOT_TOKEN", "")
+	t.Setenv("PYLON_DISCORD_GUILD_ID", "")
+	t.Setenv("PYLON_DISCORD_CHANNEL_ID", "")
+
+	cfg := Load()
+
+	if cfg.DiscordWebhook != "" {
+		t.Errorf("expected empty webhook, got %q", cfg.DiscordWebhook)
+	}
+	if cfg.DiscordBotToken != "" {
+		t.Errorf("expected empty bot token, got %q", cfg.DiscordBotToken)
+	}
+	if cfg.DiscordGuildID != "" {
+		t.Errorf("expected empty guild ID, got %q", cfg.DiscordGuildID)
+	}
+	if cfg.DiscordChannelID != "" {
+		t.Errorf("expected empty channel ID, got %q", cfg.DiscordChannelID)
+	}
+}
