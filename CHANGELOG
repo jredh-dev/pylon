@@ -1,7 +1,23 @@
 pylon - Change Log
 
 ================================================================================
-Version 0.1.0 (2026-02-18) [UNRELEASED]
+Version 0.2.0 (2026-02-18) [UNRELEASED]
+================================================================================
+
+NEW FEATURES:
+  * Discord service namespace (pylon discord ...):
+    - msg: Send messages via webhook
+    - read: Read recent messages from a channel (Bot API)
+    - channels: List text channels in a guild (Bot API)
+  * Config via env vars:
+    - PYLON_DISCORD_WEBHOOK: Webhook URL for sending messages
+    - PYLON_DISCORD_BOT_TOKEN: Bot token for reading messages/channels
+    - PYLON_DISCORD_GUILD_ID: Default guild (server) ID
+    - PYLON_DISCORD_CHANNEL_ID: Default channel ID for reading
+  * Cal feed create now supports optional slug positional arg
+
+================================================================================
+Version 0.1.0 (2026-02-18)
 ================================================================================
 
 NEW FEATURES:
