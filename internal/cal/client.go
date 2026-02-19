@@ -85,9 +85,15 @@ func (e *APIError) Error() string {
 	return fmt.Sprintf("cal api: %d %s", e.StatusCode, e.Message)
 }
 
-// CreateFeed creates a new calendar feed.
-func (c *Client) CreateFeed(name string) (*CreateFeedResponse, error) {
-	body, err := json.Marshal(map[string]string{"name": name})
+// CreateFeed creates a new calendar feed. If slug is non-empty, it is used as
+// a readable token for the subscription URL (e.g. "my-calendar" ->
+// /cal/my-calendar.ics). Otherwise the server generates a UUID token.
+func (c *Client) CreateFeed(name, slug string) (*CreateFeedResponse, error) {
+	payload := map[string]string{"name": name}
+	if slug != "" {
+		payload["slug"] = slug
+	}
+	body, err := json.Marshal(payload)
 	if err != nil {
 		return nil, fmt.Errorf("marshal request: %w", err)
 	}
