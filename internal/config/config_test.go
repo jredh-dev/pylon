@@ -30,9 +30,9 @@ func TestLoad(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if tt.envVal != "" {
-				t.Setenv("XOR_CAL_URL", tt.envVal)
+				t.Setenv("PYLON_CAL_URL", tt.envVal)
 			} else {
-				t.Setenv("XOR_CAL_URL", "")
+				t.Setenv("PYLON_CAL_URL", "")
 			}
 
 			cfg := Load()

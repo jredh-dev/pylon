@@ -32,10 +32,10 @@ jobs:
       - name: Build binaries
         run: |
           LDFLAGS="-X main.version=${{ steps.version.outputs.version }}"
-          GOOS=linux  GOARCH=amd64 go build -ldflags "$LDFLAGS" -o dist/xor-linux-amd64   ./cmd/xor/
-          GOOS=linux  GOARCH=arm64 go build -ldflags "$LDFLAGS" -o dist/xor-linux-arm64   ./cmd/xor/
-          GOOS=darwin GOARCH=amd64 go build -ldflags "$LDFLAGS" -o dist/xor-darwin-amd64  ./cmd/xor/
-          GOOS=darwin GOARCH=arm64 go build -ldflags "$LDFLAGS" -o dist/xor-darwin-arm64  ./cmd/xor/
+          GOOS=linux  GOARCH=amd64 go build -ldflags "$LDFLAGS" -o dist/pylon-linux-amd64   ./cmd/pylon/
+          GOOS=linux  GOARCH=arm64 go build -ldflags "$LDFLAGS" -o dist/pylon-linux-arm64   ./cmd/pylon/
+          GOOS=darwin GOARCH=amd64 go build -ldflags "$LDFLAGS" -o dist/pylon-darwin-amd64  ./cmd/pylon/
+          GOOS=darwin GOARCH=arm64 go build -ldflags "$LDFLAGS" -o dist/pylon-darwin-arm64  ./cmd/pylon/
 
       - name: Create GitHub release
         env:
@@ -44,7 +44,7 @@ jobs:
           gh release create "${{ steps.version.outputs.version }}" \
             --title "${{ steps.version.outputs.version }}" \
             --generate-notes \
-            dist/xor-linux-amd64 \
-            dist/xor-linux-arm64 \
-            dist/xor-darwin-amd64 \
-            dist/xor-darwin-arm64
+            dist/pylon-linux-amd64 \
+            dist/pylon-linux-arm64 \
+            dist/pylon-darwin-amd64 \
+            dist/pylon-darwin-arm64
