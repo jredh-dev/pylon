@@ -7,8 +7,8 @@ import (
 	"text/tabwriter"
 	"time"
 
-	"github.com/jredh-dev/xor/internal/cal"
-	"github.com/jredh-dev/xor/internal/config"
+	"github.com/jredh-dev/pylon/internal/cal"
+	"github.com/jredh-dev/pylon/internal/config"
 )
 
 var version = "dev"
@@ -21,7 +21,7 @@ func main() {
 
 	switch os.Args[1] {
 	case "version":
-		fmt.Println("xor", version)
+		fmt.Println("pylon", version)
 	case "cal":
 		if len(os.Args) < 3 {
 			calUsage()
@@ -89,7 +89,7 @@ func runCalFeed(client *cal.Client, args []string) {
 	switch args[0] {
 	case "create":
 		if len(args) < 2 {
-			fatal("usage: xor cal feed create <name>")
+			fatal("usage: pylon cal feed create <name>")
 		}
 		name := strings.Join(args[1:], " ")
 		feed, err := client.CreateFeed(name)
@@ -121,7 +121,7 @@ func runCalFeed(client *cal.Client, args []string) {
 
 	case "delete", "rm":
 		if len(args) < 2 {
-			fatal("usage: xor cal feed delete <id>")
+			fatal("usage: pylon cal feed delete <id>")
 		}
 		if err := client.DeleteFeed(args[1]); err != nil {
 			fatal("delete feed: %v", err)
@@ -157,7 +157,7 @@ func runCalEvent(client *cal.Client, args []string) {
 	case "list", "ls":
 		feedID := parseFeedIDFlag(args[1:])
 		if feedID == "" {
-			fatal("usage: xor cal event list --feed <feed-id>")
+			fatal("usage: pylon cal event list --feed <feed-id>")
 		}
 		events, err := client.ListEvents(feedID)
 		if err != nil {
@@ -181,7 +181,7 @@ func runCalEvent(client *cal.Client, args []string) {
 
 	case "delete", "rm":
 		if len(args) < 2 {
-			fatal("usage: xor cal event delete <id>")
+			fatal("usage: pylon cal event delete <id>")
 		}
 		if err := client.DeleteEvent(args[1]); err != nil {
 			fatal("delete event: %v", err)
@@ -197,7 +197,7 @@ func runCalEvent(client *cal.Client, args []string) {
 
 func runCalSubscribe(client *cal.Client, args []string) {
 	if len(args) < 1 {
-		fatal("usage: xor cal subscribe <token>")
+		fatal("usage: pylon cal subscribe <token>")
 	}
 	token := args[0]
 	url := client.SubscribeURL(token)
@@ -287,15 +287,15 @@ func parseFeedIDFlag(args []string) string {
 }
 
 func fatal(format string, args ...interface{}) {
-	fmt.Fprintf(os.Stderr, "xor: "+format+"\n", args...)
+	fmt.Fprintf(os.Stderr, "pylon: "+format+"\n", args...)
 	os.Exit(1)
 }
 
 func usage() {
-	fmt.Fprintf(os.Stderr, `xor - interact with deployed infrastructure
+	fmt.Fprintf(os.Stderr, `pylon - interact with deployed infrastructure
 
 Usage:
-  xor <service> <command> [flags]
+  pylon <service> <command> [flags]
 
 Services:
   cal         Calendar subscription service
@@ -304,15 +304,15 @@ Other:
   version     Show version
   help        Show this help
 
-Run 'xor <service> --help' for service-specific commands.
+Run 'pylon <service> --help' for service-specific commands.
 `)
 }
 
 func calUsage() {
-	fmt.Fprintf(os.Stderr, `xor cal - calendar service commands
+	fmt.Fprintf(os.Stderr, `pylon cal - calendar service commands
 
 Usage:
-  xor cal [--url <base-url>] <resource> <action> [flags]
+  pylon cal [--url <base-url>] <resource> <action> [flags]
 
 Resources:
   feed        Manage calendar feeds
@@ -320,12 +320,12 @@ Resources:
   subscribe   Get subscription URLs for a feed
 
 Environment:
-  XOR_CAL_URL   Base URL for the cal service (default: http://localhost:8085)
+  PYLON_CAL_URL   Base URL for the cal service (default: http://localhost:8085)
 `)
 }
 
 func calFeedUsage() {
-	fmt.Fprintf(os.Stderr, `xor cal feed - manage calendar feeds
+	fmt.Fprintf(os.Stderr, `pylon cal feed - manage calendar feeds
 
 Commands:
   create <name>       Create a new feed
@@ -335,7 +335,7 @@ Commands:
 }
 
 func calEventUsage() {
-	fmt.Fprintf(os.Stderr, `xor cal event - manage calendar events
+	fmt.Fprintf(os.Stderr, `pylon cal event - manage calendar events
 
 Commands:
   add [flags]         Create a new event
