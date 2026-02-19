@@ -196,7 +196,7 @@ func (c *Client) botGet(url string) ([]byte, error) {
 
 	body, _ := io.ReadAll(resp.Body)
 	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("Discord API error (status %d): %s", resp.StatusCode, string(body))
+		return nil, fmt.Errorf("discord API error (status %d): %s", resp.StatusCode, string(body))
 	}
 	return body, nil
 }

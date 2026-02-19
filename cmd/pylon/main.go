@@ -131,9 +131,9 @@ func runCalFeed(client *cal.Client, args []string) {
 			return
 		}
 		tw := tabwriter.NewWriter(os.Stdout, 0, 4, 2, ' ', 0)
-		fmt.Fprintf(tw, "ID\tNAME\tTOKEN\tCREATED\n")
+		_, _ = fmt.Fprintf(tw, "ID\tNAME\tTOKEN\tCREATED\n")
 		for _, f := range feeds {
-			fmt.Fprintf(tw, "%s\t%s\t%s\t%s\n",
+			_, _ = fmt.Fprintf(tw, "%s\t%s\t%s\t%s\n",
 				f.ID, f.Name, f.Token, f.CreatedAt.Format(time.DateOnly))
 		}
 		_ = tw.Flush()
@@ -187,13 +187,13 @@ func runCalEvent(client *cal.Client, args []string) {
 			return
 		}
 		tw := tabwriter.NewWriter(os.Stdout, 0, 4, 2, ' ', 0)
-		fmt.Fprintf(tw, "ID\tSUMMARY\tSTART\tEND\tSTATUS\n")
+		_, _ = fmt.Fprintf(tw, "ID\tSUMMARY\tSTART\tEND\tSTATUS\n")
 		for _, e := range events {
 			end := ""
 			if e.End != nil {
 				end = e.End.Format(time.RFC3339)
 			}
-			fmt.Fprintf(tw, "%s\t%s\t%s\t%s\t%s\n",
+			_, _ = fmt.Fprintf(tw, "%s\t%s\t%s\t%s\t%s\n",
 				e.ID, e.Summary, e.Start.Format(time.RFC3339), end, e.Status)
 		}
 		_ = tw.Flush()
@@ -310,9 +310,9 @@ func runDiscord(args []string) {
 			fatal("discord channels: %v", err)
 		}
 		tw := tabwriter.NewWriter(os.Stdout, 0, 4, 2, ' ', 0)
-		fmt.Fprintf(tw, "ID\tNAME\n")
+		_, _ = fmt.Fprintf(tw, "ID\tNAME\n")
 		for _, ch := range channels {
-			fmt.Fprintf(tw, "%s\t#%s\n", ch.ID, ch.Name)
+			_, _ = fmt.Fprintf(tw, "%s\t#%s\n", ch.ID, ch.Name)
 		}
 		_ = tw.Flush()
 

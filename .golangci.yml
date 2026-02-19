@@ -1,0 +1,21 @@
+version: "2"
+
+linters:
+  enable:
+    - govet
+    - errcheck
+    - staticcheck
+    - ineffassign
+    - unused
+    - misspell
+  settings:
+    govet:
+      enable-all: false
+  exclusions:
+    rules:
+      - linters: [errcheck]
+        text: "Error return value of .*(Close|Flush|Write|Log|Fprintf).*is not checked"
+
+formatters:
+  enable:
+    - gofmt
