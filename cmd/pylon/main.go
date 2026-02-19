@@ -310,9 +310,9 @@ func runDiscord(args []string) {
 			fatal("discord channels: %v", err)
 		}
 		tw := tabwriter.NewWriter(os.Stdout, 0, 4, 2, ' ', 0)
-		fmt.Fprintf(tw, "ID\tNAME\n")
+		_, _ = fmt.Fprintf(tw, "ID\tNAME\n")
 		for _, ch := range channels {
-			fmt.Fprintf(tw, "%s\t#%s\n", ch.ID, ch.Name)
+			_, _ = fmt.Fprintf(tw, "%s\t#%s\n", ch.ID, ch.Name)
 		}
 		_ = tw.Flush()
 

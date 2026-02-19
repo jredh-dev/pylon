@@ -14,7 +14,7 @@ linters:
   exclusions:
     rules:
       - linters: [errcheck]
-        text: "Error return value of .*(Close|Flush|Write|Log).*is not checked"
+        text: "Error return value of .*(Close|Flush|Write|Log|Fprintf).*is not checked"
 
 formatters:
   enable:
